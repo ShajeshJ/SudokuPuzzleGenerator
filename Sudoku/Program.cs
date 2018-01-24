@@ -17,7 +17,7 @@ namespace Sudoku
             var runner = new GameRunner();
             var board = runner.Board;
 
-            var boardImage = DrawBoard(board, ValidBoard(board));
+            var boardImage = DrawBoard(board/*, ValidBoard(board)*/);
 
             boardImage.Save(@"sudoku.png");
 
@@ -44,98 +44,98 @@ namespace Sudoku
             //Console.ReadKey();
         }
 
-        private static bool[,] ValidBoard(int[,] board)
-        {
-            var goodCells = new bool[9, 9];
+        //private static bool[,] ValidBoard(int[,] board)
+        //{
+        //    var goodCells = new bool[9, 9];
 
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    goodCells[i, j] = true;
-                }
-            }
+        //    for (int i = 0; i < 9; i++)
+        //    {
+        //        for (int j = 0; j < 9; j++)
+        //        {
+        //            goodCells[i, j] = true;
+        //        }
+        //    }
 
-            var checkHorz = new HashSet<int>();
-            var checkVert = new HashSet<int>();
+        //    var checkHorz = new HashSet<int>();
+        //    var checkVert = new HashSet<int>();
 
-            var badRow = false;
-            var badCol = false;
+        //    var badRow = false;
+        //    var badCol = false;
 
-            for (int i = 0; i < 9; i++)
-            {
-                badRow = false;
-                badCol = false;
-                checkHorz.Clear();
-                checkVert.Clear();
+        //    for (int i = 0; i < 9; i++)
+        //    {
+        //        badRow = false;
+        //        badCol = false;
+        //        checkHorz.Clear();
+        //        checkVert.Clear();
 
-                for (int j = 0; j < 9; j++)
-                {
-                    if(board[i, j] != -1 && !checkHorz.Add(board[i, j]))
-                    {
-                        badRow = true;
-                    }
+        //        for (int j = 0; j < 9; j++)
+        //        {
+        //            if (board[i, j] != -1 && !checkHorz.Add(board[i, j]))
+        //            {
+        //                badRow = true;
+        //            }
 
-                    if(board[j, i] != -1 && !checkVert.Add(board[j, i]))
-                    {
-                        badCol = true;
-                    }
-                }
+        //            if (board[j, i] != -1 && !checkVert.Add(board[j, i]))
+        //            {
+        //                badCol = true;
+        //            }
+        //        }
 
-                if (badRow)
-                {
-                    for (int j = 0; j < 9; j++)
-                    {
-                        goodCells[i, j] = false;
-                    }
-                }
+        //        if (badRow)
+        //        {
+        //            for (int j = 0; j < 9; j++)
+        //            {
+        //                goodCells[i, j] = false;
+        //            }
+        //        }
 
-                if (badCol)
-                {
-                    for (int j = 0; j < 9; j++)
-                    {
-                        goodCells[j, i] = false;
-                    }
-                }
-            }
+        //        if (badCol)
+        //        {
+        //            for (int j = 0; j < 9; j++)
+        //            {
+        //                goodCells[j, i] = false;
+        //            }
+        //        }
+        //    }
 
-            var checkBox = new HashSet<int>();
+        //    var checkBox = new HashSet<int>();
 
-            for (int i = 0; i < 9; i+=3)
-            {
-                for (int j = 0; j < 9; j+=3)
-                {
-                    checkBox.Clear();
+        //    for (int i = 0; i < 9; i += 3)
+        //    {
+        //        for (int j = 0; j < 9; j += 3)
+        //        {
+        //            checkBox.Clear();
 
-                    var valid = (board[i, j] == -1 || checkBox.Add(board[i, j]))
-                                && (board[i + 1, j] == -1 || checkBox.Add(board[i + 1, j]))
-                                && (board[i + 2, j] == -1 || checkBox.Add(board[i + 2, j]))
-                                && (board[i, j + 1] == -1 || checkBox.Add(board[i, j + 1]))
-                                && (board[i + 1, j + 1] == -1 || checkBox.Add(board[i + 1, j + 1]))
-                                && (board[i + 2, j + 1] == -1 || checkBox.Add(board[i + 2, j + 1]))
-                                && (board[i, j + 2] == -1 || checkBox.Add(board[i, j + 2]))
-                                && (board[i + 1, j + 2] == -1 || checkBox.Add(board[i + 1, j + 2]))
-                                && (board[i + 2, j + 2] == -1 || checkBox.Add(board[i + 2, j + 2]));
+        //            var valid = (board[i, j] == -1 || checkBox.Add(board[i, j]))
+        //                        && (board[i + 1, j] == -1 || checkBox.Add(board[i + 1, j]))
+        //                        && (board[i + 2, j] == -1 || checkBox.Add(board[i + 2, j]))
+        //                        && (board[i, j + 1] == -1 || checkBox.Add(board[i, j + 1]))
+        //                        && (board[i + 1, j + 1] == -1 || checkBox.Add(board[i + 1, j + 1]))
+        //                        && (board[i + 2, j + 1] == -1 || checkBox.Add(board[i + 2, j + 1]))
+        //                        && (board[i, j + 2] == -1 || checkBox.Add(board[i, j + 2]))
+        //                        && (board[i + 1, j + 2] == -1 || checkBox.Add(board[i + 1, j + 2]))
+        //                        && (board[i + 2, j + 2] == -1 || checkBox.Add(board[i + 2, j + 2]));
 
-                    if (!valid)
-                    {
-                        goodCells[i, j] = false;
-                        goodCells[i + 1, j] = false;
-                        goodCells[i + 2, j] = false;
-                        goodCells[i, j + 1] = false;
-                        goodCells[i + 1, j + 1] = false;
-                        goodCells[i + 2, j + 1] = false;
-                        goodCells[i, j + 2] = false;
-                        goodCells[i + 1, j + 2] = false;
-                        goodCells[i + 2, j + 2] = false;
-                    }
-                }
-            }
+        //            if (!valid)
+        //            {
+        //                goodCells[i, j] = false;
+        //                goodCells[i + 1, j] = false;
+        //                goodCells[i + 2, j] = false;
+        //                goodCells[i, j + 1] = false;
+        //                goodCells[i + 1, j + 1] = false;
+        //                goodCells[i + 2, j + 1] = false;
+        //                goodCells[i, j + 2] = false;
+        //                goodCells[i + 1, j + 2] = false;
+        //                goodCells[i + 2, j + 2] = false;
+        //            }
+        //        }
+        //    }
 
-            return goodCells;
-        }
+        //    return goodCells;
+        //}
 
-        private static Image DrawBoard(int [,] board, bool[,] valid)
+        private static Image DrawBoard(int [,] board/*, bool[,] valid*/)
         {
             var tmpImg = new Bitmap(1, 1);
             var tmpDrawing = Graphics.FromImage(tmpImg);
@@ -149,9 +149,9 @@ namespace Sudoku
             tmpDrawing.Dispose();
 
             var goodImgs = new Bitmap[10];
-            var badImgs = new Bitmap[10];
+            //var badImgs = new Bitmap[10];
             var goodDrawings = new Graphics[10];
-            var badDrawings = new Graphics[10];
+            //var badDrawings = new Graphics[10];
 
             goodImgs[0] = new Bitmap((int)textSize.Width, (int)textSize.Height);
             goodDrawings[0] = Graphics.FromImage(goodImgs[0]);
@@ -159,27 +159,27 @@ namespace Sudoku
             goodDrawings[0].Save();
             goodDrawings[0].Dispose();
 
-            badImgs[0] = new Bitmap((int)textSize.Width, (int)textSize.Height);
-            badDrawings[0] = Graphics.FromImage(badImgs[0]);
-            badDrawings[0].Clear(Color.PaleVioletRed);
-            badDrawings[0].Save();
-            badDrawings[0].Dispose();
+            //badImgs[0] = new Bitmap((int)textSize.Width, (int)textSize.Height);
+            //badDrawings[0] = Graphics.FromImage(badImgs[0]);
+            //badDrawings[0].Clear(Color.PaleVioletRed);
+            //badDrawings[0].Save();
+            //badDrawings[0].Dispose();
 
             for (int i = 1; i < goodImgs.Length; i++)
             {
                 goodImgs[i] = new Bitmap((int)textSize.Width, (int)textSize.Height);
                 goodDrawings[i] = Graphics.FromImage(goodImgs[i]);
                 goodDrawings[i].Clear(Color.White);
-                goodDrawings[i].DrawString($"{i + 1}", font, textBrush, 0, 0);
+                goodDrawings[i].DrawString((i+1).ToString(), font, textBrush, 0, 0);
                 goodDrawings[i].Save();
                 goodDrawings[i].Dispose();
 
-                badImgs[i] = new Bitmap((int)textSize.Width, (int)textSize.Height);
-                badDrawings[i] = Graphics.FromImage(badImgs[i]);
-                badDrawings[i].Clear(Color.PaleVioletRed);
-                badDrawings[i].DrawString($"{i + 1}", font, textBrush, 0, 0);
-                badDrawings[i].Save();
-                badDrawings[i].Dispose();
+                //badImgs[i] = new Bitmap((int)textSize.Width, (int)textSize.Height);
+                //badDrawings[i] = Graphics.FromImage(badImgs[i]);
+                //badDrawings[i].Clear(Color.PaleVioletRed);
+                //badDrawings[i].DrawString($"{i + 1}", font, textBrush, 0, 0);
+                //badDrawings[i].Save();
+                //badDrawings[i].Dispose();
             }
 
             var tileWidth = goodImgs[0].Width;
@@ -194,11 +194,13 @@ namespace Sudoku
                 {
                     if (board[i, j] != -1)
                     {
-                        boardDrawing.DrawImage(valid[i, j] ? goodImgs[board[i, j]] : badImgs[board[i, j]], j * tileWidth, i * tileHeight);
+                        //boardDrawing.DrawImage(valid[i, j] ? goodImgs[board[i, j]] : badImgs[board[i, j]], j * tileWidth, i * tileHeight);
+                        boardDrawing.DrawImage(goodImgs[board[i, j]], j * tileWidth, i * tileHeight);
                     }
                     else
                     {
-                        boardDrawing.DrawImage(valid[i, j] ? goodImgs[0] : badImgs[0], j * tileWidth, i * tileHeight);
+                        //boardDrawing.DrawImage(valid[i, j] ? goodImgs[0] : badImgs[0], j * tileWidth, i * tileHeight);
+                        boardDrawing.DrawImage(goodImgs[0], j * tileWidth, i * tileHeight);
                     }
                 }
             }

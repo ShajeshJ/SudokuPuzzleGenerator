@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,6 +56,18 @@ namespace Sudoku
 
             _solvedBoard = FillBoard(0, _solvedBoard);
             _puzzleBoard = CreatePuzzle(_solvedBoard);
+
+            //var totalWatch = Stopwatch.StartNew();
+
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    var stopwatch = Stopwatch.StartNew();
+            //    CreatePuzzle(_solvedBoard);
+            //    stopwatch.Stop();
+            //    Console.WriteLine($"Iteration {i+1}: {stopwatch.Elapsed}");
+            //}
+
+            //Console.WriteLine($"Average: {new TimeSpan(totalWatch.ElapsedTicks/100)}");
         }
 
         private static void InitSetLookup()
@@ -105,7 +118,7 @@ namespace Sudoku
 
         private int[] FillBoard(int cell, int[] board)
         {
-            var validValues = new HashSet<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            var validValues = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
             for (int i = 0; i < cell; i++)
             {
@@ -122,7 +135,7 @@ namespace Sudoku
                     return null;
                 }
 
-                board[cell] = validValues.ElementAt(_rng.Next(0, validValues.Count));
+                board[cell] = validValues[_rng.Next(0, validValues.Count)];
                 validValues.Remove(board[cell]);
 
                 if (cell == 80)
@@ -141,49 +154,115 @@ namespace Sudoku
 
         private int[] CreatePuzzle(int[] board)
         {
-            var newBoard = new int[board.Length];
+            int[] newboard = new int[board.Length];
 
-            for (int i = 0; i < newBoard.Length; i++)
+            do
             {
-                newBoard[i] = -1;
-            }
+                var randomizedCells = Enumerable.Range(0, 41).ToArray();
+                Shuffle(ref randomizedCells);
 
-            var cellsToTry = new HashSet<int>(Enumerable.Range(0, newBoard.Length));
+                var cellsToFill = new List<int>();
 
-            while (cellsToTry.Count > 0)
-            {
-                var tryCell = cellsToTry.ElementAt(_rng.Next(0, cellsToTry.Count()));
-
-                var insert = false;
-
-                foreach (var matchCell in _setLookup[tryCell])
+                for (int i = 0; i < 18; i++)
                 {
-                    if (newBoard[matchCell] == -1)
+                    cellsToFill.Add(randomizedCells[i]);
+
+                    //Add random cells symmetrically
+                    if (80 - randomizedCells[i] != randomizedCells[i])
                     {
-                        var validValues = new HashSet<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-
-                        foreach (var checkCell in _setLookup[matchCell])
-                        {
-                            validValues.Remove(newBoard[checkCell]);
-                        }
-
-                        if (validValues.Contains(board[tryCell]))
-                        {
-                            insert = true;
-                            break;
-                        }
+                        cellsToFill.Add(80 - randomizedCells[i]);
                     }
                 }
 
-                if (insert)
+                newboard = new int[board.Length];
+
+                for (int i = 0; i < board.Length; i++)
                 {
-                    newBoard[tryCell] = board[tryCell];
+                    if (cellsToFill.Contains(i))
+                    {
+                        newboard[i] = board[i];
+                    }
+                    else
+                    {
+                        newboard[i] = -1;
+                    }
+                }
+            } while (!IsUniquePuzzle(0, newboard, board));
+
+            return newboard;
+        }
+
+        private void Shuffle(ref int[] array)
+        {
+            for (int i = array.Length - 1; i > 0; i--)
+            {
+                var swapIdx = _rng.Next(i);
+                var temp = array[i];
+                array[i] = array[swapIdx];
+                array[swapIdx] = temp;
+            }
+        }
+
+        private bool IsUniquePuzzle(int cell, int[] board, int[] solution)
+        {
+            if (cell >= board.Length)
+            {
+                return CheckSolutionsMatch(board, solution);
+            }
+            else if (board[cell] > 0)
+            {
+                return IsUniquePuzzle(cell + 1, board, solution);
+            }
+            else
+            {
+                var validValues = new List<int>(Enumerable.Range(1, 9));
+
+                for (int i = 0; i < board.Length; i++)
+                {
+                    if (_setLookup[cell].Contains(i))
+                    {
+                        validValues.Remove(board[i]);
+                    }
                 }
 
-                cellsToTry.Remove(tryCell);
+                while (true)
+                {
+                    if (validValues.Count == 0)
+                    {
+                        return true;
+                    }
+
+                    board[cell] = validValues[_rng.Next(0, validValues.Count)];
+                    validValues.Remove(board[cell]);
+
+                    var isUnique = IsUniquePuzzle(cell + 1, board, solution);
+
+                    board[cell] = -1;
+
+                    if (!isUnique)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        private bool CheckSolutionsMatch(int[] board1, int[] board2)
+        {
+            if (board1.Length != board2.Length)
+            {
+                return false;
             }
 
-            return newBoard;
+            for (int i = 0; i < board1.Length; i++)
+            {
+                if (board1[i] != board2[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
